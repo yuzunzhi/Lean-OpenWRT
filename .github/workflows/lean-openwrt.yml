@@ -7,7 +7,7 @@ on:
     branches:
       - master
     paths:
-      - '.config'
+      - '.github/workflows/lean-openwrt.yml'
 #  schedule:
 #    - cron: 0 8 * * 5
   watch:
@@ -18,7 +18,7 @@ env:
   REPO_BRANCH: master
   CONFIG_FILE: .config
   LAN_IP: modify-lan-ip.sh
-  SSH_ACTIONS: true
+  SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: false
@@ -27,7 +27,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
     - name: Checkout
@@ -43,27 +42,36 @@ jobs:
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
     - name: Clone source code
-      run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
-
-    - name: ADD clash for openwrt
-      run : git clone https://github.com/frainzy1477/luci-app-clash.git package/luci-app-clash
-    
-    - name: ADD ssr-plus for openwrt
-      run : git clone https://github.com/yuzunzhi/luci-app-ssr-plus22.git package/lean/luci-app-ssr-plus
-
-    - name: Update feeds
-      run: cd openwrt && ./scripts/feeds update -a
-
-    - name: Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
-
-    - name: Load custom configuration
       run: |
-        [ -e files ] && mv files openwrt/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        chmod +x $LAN_IP
-        cd openwrt
-        ../$LAN_IP
+        git clone $REPO_URL -b $REPO_BRANCH
+        cd lede
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+
+    - name: ADD custom config & packages
+      run : |
+        cd lede
+        curl -fsSL https://raw.githubusercontent.com/yuzunzhi/Lean-OpenWRT/master/.config >.config
+        mkdir -p package/custom
+        cd package/custom
+        git clone https://github.com/kenzok8/small
+        git clone https://github.com/kenzok8/openwrt-packages
+        git clone https://github.com/Lienol/openwrt-package
+        git clone https://github.com/fw876/helloworld
+        git clone https://github.com/openwrt-develop/luci-theme-atmaterial
+        git clone https://github.com/vernesong/OpenClash
+        git clone https://github.com/tty228/luci-app-serverchan
+        git clone https://github.com/rufengsuixing/luci-app-adguardhome
+        git clone https://github.com/pymumu/luci-app-smartdns
+        git clone -b 18.06  https://github.com/jerrykuku/luci-theme-argon
+        cd ../..
+        ./scripts/feeds install -a
+
+    - name: Modify LAN IP
+      run: |
+        cd lede 
+        sed -i 's/192.168.1.1/10.0.0.1/g' package/base-files/files/bin/config_generate
+
     - name: SSH connection to Actions
       uses: P3TERX/debugger-action@master
       if: env.SSH_ACTIONS == 'true'
@@ -76,6 +84,7 @@ jobs:
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
+
     - name: Compile the firmware
       id: compile
       run: |
@@ -83,6 +92,7 @@ jobs:
         echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 V=s
         echo "::set-output name=status::success"
+
     - name: Upload bin directory
       uses: actions/upload-artifact@master
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
@@ -98,6 +108,7 @@ jobs:
         rm -rf packages
         echo "::set-env name=FIRMWARE::$PWD"
         echo "::set-output name=status::success"
+        
     - name: Upload firmware directory
       uses: actions/upload-artifact@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
