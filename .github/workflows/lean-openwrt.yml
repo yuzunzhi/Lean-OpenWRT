@@ -7,6 +7,7 @@ on:
     branches:
       - master
     paths:
+      - '.config'
       - '.github/workflows/lean-openwrt.yml'
 #  schedule:
 #    - cron: 0 8 * * 5
@@ -50,8 +51,8 @@ jobs:
 
     - name: ADD custom config & packages
       run : |
+        cp .config lede/.config
         cd lede
-        curl -fsSL https://raw.githubusercontent.com/yuzunzhi/Lean-OpenWRT/master/.config >.config
         mkdir -p package/custom
         cd package/custom
         git clone https://github.com/kenzok8/small
@@ -108,7 +109,7 @@ jobs:
         rm -rf packages
         echo "::set-env name=FIRMWARE::$PWD"
         echo "::set-output name=status::success"
-        
+
     - name: Upload firmware directory
       uses: actions/upload-artifact@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
