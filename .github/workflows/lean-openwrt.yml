@@ -45,6 +45,12 @@ jobs:
     - name: Clone source code
       run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
 
+    - name: ADD clash for openwrt
+      run : git clone https://github.com/frainzy1477/luci-app-clash.git package/luci-app-clash
+    
+    - name: ADD ssr-plus for openwrt
+      run : git clone https://github.com/yuzunzhi/luci-app-ssr-plus22.git package/lean/luci-app-ssr-plus
+
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
