@@ -68,10 +68,10 @@ jobs:
         cd ../..
         ./scripts/feeds install -a
 
-    - name: Modify LAN IP
-      run: |
-        cd lede 
-        sed -i 's/192.168.1.1/10.0.0.1/g' package/base-files/files/bin/config_generate
+#    - name: Modify LAN IP
+#      run: |
+#        cd lede 
+#        sed -i 's/192.168.1.1/10.0.0.1/g' package/base-files/files/bin/config_generate
 
     - name: SSH connection to Actions
       uses: P3TERX/debugger-action@master
