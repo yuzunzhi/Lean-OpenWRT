@@ -26,6 +26,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Remove old artifacts
+      uses: c-hive/gha-remove-artifacts@v1
+      with:
+        age: '1 day'
+        # Optional inputs
+        # skip-tags: true
+        # skip-recent: 5
+
     - name: Checkout
       uses: actions/checkout@master
 
