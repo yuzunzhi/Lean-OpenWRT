@@ -7,7 +7,6 @@ on:
     branches:
       - master
     paths:
-      - '.config'
       - '.github/workflows/lean-openwrt.yml'
 #  schedule:
 #    - cron: 0 8 * * 5
@@ -15,11 +14,8 @@ on:
     types: started
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
-  REPO_BRANCH: master
   CONFIG_FILE: .config
-  LAN_IP: modify-lan-ip.sh
-  SSH_ACTIONS: true
+  SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: false
@@ -44,7 +40,7 @@ jobs:
         sudo -E apt-get -qq clean
     - name: Clone source code
       run: |
-        git clone $REPO_URL -b $REPO_BRANCH
+        git clone https://github.com/coolsnowwolf/lede
         cd lede
         ./scripts/feeds update -a
         ./scripts/feeds install -a
@@ -59,13 +55,9 @@ jobs:
         git clone https://github.com/kenzok8/openwrt-packages
         git clone https://github.com/Lienol/openwrt-package
         git clone https://github.com/fw876/helloworld
-        git clone https://github.com/openwrt-develop/luci-theme-atmaterial
-        git clone https://github.com/vernesong/OpenClash
-        git clone https://github.com/tty228/luci-app-serverchan
-        git clone https://github.com/rufengsuixing/luci-app-adguardhome
+        cd ../../feeds/luci/applications/
         git clone https://github.com/pymumu/luci-app-smartdns
-        git clone -b 18.06  https://github.com/jerrykuku/luci-theme-argon
-        cd ../..
+        cd ../../..
         ./scripts/feeds install -a
 
 #    - name: Modify LAN IP
