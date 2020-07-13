@@ -50,6 +50,7 @@ jobs:
       run: |
         git clone https://github.com/coolsnowwolf/lede
         cd lede
+        sed -i 's/5.4/4.19/g' target/linux/x86/Makefile
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
