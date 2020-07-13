@@ -50,13 +50,14 @@ jobs:
       run: |
         git clone https://github.com/coolsnowwolf/lede
         cd lede
-        sed -i 's/5.4/4.19/g' target/linux/x86/Makefile
+        git checkout 33abeff31cfb2
+        #sed -i 's/5.4/4.19/g' target/linux/x86/Makefile
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
     - name: ADD custom config & packages
       run : |
-        cp .config lede/.config
+        cp .config-4.19 lede/.config
         cd lede
         mkdir -p package/custom
         cd package/custom
