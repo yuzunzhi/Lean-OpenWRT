@@ -10,8 +10,8 @@ on:
       - '.github/workflows/lean-openwrt-stable.yml'
 #  schedule:
 #    - cron: 0 8 * * 5
-  watch:
-    types: started
+#  watch:
+#    types: started
 
 env:
   CONFIG_FILE: .config
