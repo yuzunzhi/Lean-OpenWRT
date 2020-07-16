@@ -62,11 +62,7 @@ jobs:
         git clone https://github.com/Lienol/openwrt-package
         git clone https://github.com/frainzy1477/luci-app-clash.git
         git clone https://github.com/vernesong/OpenClash.git -b master
-        cd ../../feeds/luci/applications/
-        git clone https://github.com/pymumu/luci-app-smartdns
-        cd ../../packages/net
-        git clone https://github.com/pymumu/openwrt-smartdns.git smartdns
-        cd ../../..
+        cd ../..
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
